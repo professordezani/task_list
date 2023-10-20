@@ -12,7 +12,13 @@ class TaskListPage extends StatelessWidget {
         title: Text("Tasks")
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: db.collection('tasks').snapshots(),
+        
+        stream: db
+          .collection('tasks')
+          .orderBy('name')
+          .where('finished', isEqualTo: false)
+          .snapshots(),
+
         builder: (context, snapshot) {
 
           if(!snapshot.hasData)
@@ -21,11 +27,16 @@ class TaskListPage extends StatelessWidget {
           var docs = snapshot.data!.docs;
 
           return ListView(
-            children: docs.map((doc) => CheckboxListTile(
-                title: Text(doc['name']),
-                value: doc['finished'],
-                onChanged: (value) {},
-              )).toList(),
+            children: docs.map((doc) => Dismissible(
+              background: Container(color: Colors.red),
+              key: Key(doc.id),
+              onDismissed: (_) => doc.reference.delete(),
+              child: CheckboxListTile(
+                  title: Text(doc['name']),
+                  value: doc['finished'],
+                  onChanged: (value) => doc.reference.update({'finished': value!}),
+                ),
+            )).toList(),
           );
         }
       ),

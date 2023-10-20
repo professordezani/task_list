@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class TaskCreatePage extends StatelessWidget {
   TaskCreatePage({super.key});
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final txtNameCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class TaskCreatePage extends StatelessWidget {
         child: Column(
           children: [
             TextField(
+              controller: txtNameCtrl,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                 labelText: "Description"
@@ -25,7 +27,12 @@ class TaskCreatePage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 child: Text("Salvar"),
-                onPressed: () => db.collection('tasks').add({'name': 'Task 2'})//Navigator.of(context).pop(),
+                onPressed: () => db.collection('tasks')
+                  .add(
+                    {
+                      'name': txtNameCtrl.text,
+                      'finished': false
+                     })
               ),
             ),
           ],
